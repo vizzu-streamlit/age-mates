@@ -255,7 +255,6 @@ if st.button('Create Story'):
             Config(
                 {
                     'label':None,
-                    'geometry':'area',
                     'title': title6
                 }
             )
