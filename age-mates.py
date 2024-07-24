@@ -27,7 +27,7 @@ st.markdown(
     }
     </style>
     <div class="centered">
-        <h1 class="title">You in the World</h1>
+        <h1 class="title">Your Age-Mates</h1>
     </div>
     """,
     unsafe_allow_html=True
@@ -40,25 +40,10 @@ ssl._create_default_https_context = ssl._create_unverified_context
 initial_csv_path = 'data.csv'  # Adjusted path for local execution
 df = pd.read_csv(initial_csv_path, encoding='ISO-8859-1')
 
+st.subheader('When and Where Were You Born?', divider='rainbow')
+
 # Create columns for the selections
-col1, col2, col3 = st.columns(3)
-
-with col1:
-    country_list = df['Country'].drop_duplicates()
-    selected_country = st.selectbox('Country:', country_list)
-
-abr_country = df['ISO3_code'].loc[df['Country'] == selected_country].values[0]
-
-# Determine the subregion for the selected country
-subregion = df['Subregion'].loc[df['Country'] == selected_country].drop_duplicates().values[0]
-
-continent = df['Continent'].loc[df['Country'] == selected_country].drop_duplicates().values[0]
-
-with col2:
-    gender_list = df['Gender'].drop_duplicates()
-    selected_gender = st.radio('Gender:', gender_list)
-
-g_type = df['G_Type'].loc[df['Gender'] == selected_gender].values[0]
+col1, col2, col3 = st.columns(3, gap="medium")
 
 # Function to match year with generation
 def get_generation(year):
@@ -73,10 +58,31 @@ def get_generation(year):
     else: 
         return "Gen A"
 
-with col3:
+with col1:
     # Number input for year with automatic generation matching
-    selected_year = st.slider('Year Born', min_value=1950, max_value=2024, value=1980)
+    selected_year = st.number_input('Year Born (1950-2024)', min_value=1950, max_value=2024, value=1980)
     generation = get_generation(selected_year)
+
+with col2:
+    country_list = df['Country'].drop_duplicates()
+    selected_country = st.selectbox('Country', country_list)
+
+abr_country = df['ISO3_code'].loc[df['Country'] == selected_country].values[0]
+
+# Determine the subregion for the selected country
+subregion = df['Subregion'].loc[df['Country'] == selected_country].drop_duplicates().values[0]
+
+continent = df['Continent'].loc[df['Country'] == selected_country].drop_duplicates().values[0]
+
+
+with col3:
+    gender_list = df['Gender'].drop_duplicates()
+    selected_gender = st.radio('Gender', gender_list)
+
+g_type = df['G_Type'].loc[df['Gender'] == selected_gender].values[0]
+
+
+
 
 # Add new column to mark selected year
 df['IsSelectedYear'] = df['Year'].apply(lambda x: 'yes' if x == selected_year else 'no')
@@ -129,6 +135,7 @@ if st.button('Create Story'):
                 }
             ),
             Style({
+                'logo' : {'width' : '5em', 'filter': 'none'},
                 'title' : {'fontSize' : '3em'},
                 'plot' : {'marker' :{ 
                     'label' :{ 
@@ -228,7 +235,9 @@ if st.button('Create Story'):
     )
     story.add_slide(slide5)
 
-    slide5_1 = Slide(
+    slide6 = Slide()
+
+    slide6.add_step(
         Step(
             Data.filter(f"record['Year'] == '{selected_year}'"),
             Config(
@@ -236,25 +245,43 @@ if st.button('Create Story'):
                     'geometry': 'rectangle',
                     'x': 'Year2',
                     'y': ['Population','Continent'],
-                    'label': 'Population',
-                    'legend':'color',
+                    'label': None,
                     'title': title5
                 }
             )
         )
     )
-    story.add_slide(slide5_1)
 
+    slide6.add_step(
+        Step(
+            Config(
+                {
+                    'y': 'Population',
+                    'color': 'Generation',
+                }
+            )
+        )
+    )
+
+    
+    slide6.add_step(
+        Step(
+            Config(
+                {
+                    'label': 'Population',
+                }
+            )
+        )
+    )
 
     pop6 = df[(df['Generation'] == generation)]['Population'].sum()
     title6 = f"You Belong to the {format_population(pop6)} {generation}s Worldwide"
 
-    slide6 = Slide(
+    slide6.add_step(
         Step(
             Data.filter(f"record['Generation'] == '{generation}'"),
             Config(
                 {
-                    'label':None,
                     'title': title6
                 }
             )
@@ -262,265 +289,94 @@ if st.button('Create Story'):
     )
     story.add_slide(slide6)
 
-    # Start of slide 7
-    generations = ['Baby Boomer', 'Gen X', 'Millennial', 'Gen Z', 'Gen A']
-    start_index = generations.index(generation)
     slide7 = Slide()
 
-    if generation == 'Baby Boomer':
-        # Include all generations in order, stacking as steps
-        for i in range(start_index, len(generations)):
-            filter_condition = " || ".join([f"record['Generation'] == '{gen}'" for gen in generations[start_index:i+1]])
-            step = Step(
-                Data.filter(f"record['Country'] == '{selected_country}' && ({filter_condition}) && record['Gender'] == '{selected_gender}'"),
-                Config.stackedBar(
-                    {
-                        'x': 'Population',
-                        'color': 'Generation',
-                        'stackedBy': 'Generation',
-                        'title': f"Distribution of {g_type} Born Since 1950 ({abr_country})"
-                    }
-                )
-            )
-            slide7.add_step(step)
-    elif generation == 'Gen A':
-        # Include all generations in reverse order, stacking as steps
-        for i in range(len(generations) - 1, -1, -1):
-            filter_condition = " || ".join([f"record['Generation'] == '{gen}'" for gen in generations[i:]])
-            step = Step(
-                Data.filter(f"record['Country'] == '{selected_country}' && ({filter_condition}) && record['Gender'] == '{selected_gender}'"),
-                Config.stackedBar(
-                    {
-                        'x': 'Population',
-                        'color': 'Generation',
-                        'stackedBy': 'Generation',
-                        'title': f"Distribution of {g_type} Born Since 1950 ({abr_country})"
-                    }
-                )
-            )
-            slide7.add_step(step)
-    elif generation == 'Gen Z':
-        # Include Gen A, Millennials, and Gen Z in order, then stack the rest in reverse order
-        initial_generations = generations[start_index - 1:start_index + 2]
-        filter_condition = " || ".join([f"record['Generation'] == '{gen}'" for gen in initial_generations])
-        step = Step(
-            Data.filter(f"record['Country'] == '{selected_country}' && ({filter_condition}) && record['Gender'] == '{selected_gender}'"),
-            Config.stackedBar(
+    slide7.add_step(
+        Step(
+            Config(
                 {
-                    'x': 'Population',
-                    'color': 'Generation',
-                    'stackedBy': 'Generation',
-                    'title': f"Distribution of {g_type} Born Since 1950 ({abr_country})"
+                    'label': None,
                 }
             )
         )
-        slide7.add_step(step)
+    )
 
-        included_generations = generations[start_index + 2:] + generations[:start_index - 1][::-1]
-        for i in range(len(included_generations)):
-            filter_condition = " || ".join([f"record['Generation'] == '{gen}'" for gen in initial_generations + included_generations[:i+1]])
-            step = Step(
-                Data.filter(f"record['Country'] == '{selected_country}' && ({filter_condition}) && record['Gender'] == '{selected_gender}'"),
-                Config.stackedBar(
-                    {
-                        'x': 'Population',
-                        'color': 'Generation',
-                        'stackedBy': 'Generation',
-                        'title': f"Distribution of {g_type} Born Since 1950 ({abr_country})"
-                    }
-                )
-            )
-            slide7.add_step(step)
-    elif generation == 'Millennial':
-        # First step: Include Millennials stacked with Gen Z and Gen X
-        initial_generations = ['Gen Z', 'Gen X', 'Millennial']
-        filter_condition = " || ".join([f"record['Generation'] == '{gen}'" for gen in initial_generations])
-        step = Step(
-            Data.filter(f"record['Country'] == '{selected_country}' && ({filter_condition}) && record['Gender'] == '{selected_gender}'"),
-            Config.stackedBar(
+    slide7.add_step(
+        Step(
+            Config(
                 {
-                    'x': 'Population',
-                    'color': 'Generation',
-                    'stackedBy': 'Generation',
-                    'title': f"Distribution of {g_type} Born Since 1950 ({abr_country})"
+                    'x': ['Generation','Population'],
+                    'y': None
                 }
             )
         )
-        slide7.add_step(step)
+    )
 
-        # Second step: Add Baby Boomers and Gen A
-        additional_generations = ['Baby Boomer', 'Gen A']
-        filter_condition = " || ".join([f"record['Generation'] == '{gen}'" for gen in initial_generations + additional_generations])
-        step = Step(
-            Data.filter(f"record['Country'] == '{selected_country}' && ({filter_condition}) && record['Gender'] == '{selected_gender}'"),
-            Config.stackedBar(
+    slide7.add_step(
+        Step(
+            Config(
                 {
-                    'x': 'Population',
-                    'color': 'Generation',
-                    'stackedBy': 'Generation',
-                    'title': f"Distribution of {g_type} Born Since 1950 ({abr_country})"
+                    'label':'Population'                        
                 }
-            )
+            ),
+            Style({
+                'plot' : {'marker' :{ 'label' :{ 'position' : 'center'}}},
+            })
         )
-        slide7.add_step(step)
+    )
 
-        # Add remaining generations (if any) step by step
-        included_generations = additional_generations + generations[start_index + 1:] + generations[:start_index - 1][::-1]
-        for i in range(len(included_generations) - len(initial_generations)):
-            filter_condition = " || ".join([f"record['Generation'] == '{gen}'" for gen in initial_generations + included_generations[:i+1 + len(initial_generations)]])
-            step = Step(
-                Data.filter(f"record['Country'] == '{selected_country}' && ({filter_condition}) && record['Gender'] == '{selected_gender}'"),
-                Config.stackedBar(
+    pop7 = df['Population'].sum()
+
+    slide7.add_step(
+        Step(
+                Data.filter(None),
+                Config(
                     {
-                        'x': 'Population',
-                        'color': 'Generation',
-                        'stackedBy': 'Generation',
-                        'title': f"Distribution of {g_type} Born Since 1950 ({abr_country})"
+                        'label':['Generation','Population'],
+                        'title': f"You Are One of {format_population(pop7)} People Born after 1950 in the World"
                     }
                 )
-            )
-            slide7.add_step(step)
-    elif generation == 'Gen X':
-        # Include Baby Boomers, Gen X, and Millennials together at the start
-        initial_generations = ['Baby Boomer', 'Gen X', 'Millennial']
-        filter_condition = " || ".join([f"record['Generation'] == '{gen}'" for gen in initial_generations])
-        step = Step(
-            Data.filter(f"record['Country'] == '{selected_country}' && ({filter_condition}) && record['Gender'] == '{selected_gender}'"),
-            Config.stackedBar(
-                {
-                    'x': 'Population',
-                    'color': 'Generation',
-                    'stackedBy': 'Generation',
-                    'title': f"Distribution of {g_type} Born Since 1950 ({abr_country})"
-                }
-            )
         )
-        slide7.add_step(step)
+    )
 
-        # Then add the rest of the generations in reverse order
-        included_generations = generations[start_index + 2:] + generations[:start_index - 1][::-1]
-        for i in range(len(included_generations)):
-            filter_condition = " || ".join([f"record['Generation'] == '{gen}'" for gen in initial_generations + included_generations[:i+1]])
-            step = Step(
-                Data.filter(f"record['Country'] == '{selected_country}' && ({filter_condition}) && record['Gender'] == '{selected_gender}'"),
-                Config.stackedBar(
-                    {
-                        'x': 'Population',
-                        'color': 'Generation',
-                        'stackedBy': 'Generation',
-                        'title': f"Distribution of {g_type} Born Since 1950 ({abr_country})"
-                    }
-                )
-            )
-            slide7.add_step(step)
     story.add_slide(slide7)
-    # End of Slide 7
 
     slide8 = Slide()
+
     slide8.add_step(
         Step(
-            Data.filter(f"record['Subregion'] == '{subregion}' && record['Generation'] && record['Gender'] == '{selected_gender}'"),
-            Config.bar(
-                {
-                    'y': 'Population',
-                    'y': 'ISO3_code',
-                    'color': 'Country',
-                    'title': f"Distribution of All {g_type} Born Since 1950 ({subregion})"
-                }
-            )
+                Data.filter(None),
+                Config(
+                    {
+                        'label':['Generation','Population'],
+                        'align':'stretch',
+                        'title': f"Your Generation is {(pop6 / pop7) * 100:.1f}% of People Born after 1950"
+                    }
+                )
         )
     )
-    slide8.add_step(
-        Step(
-            Data.filter(f"record['Subregion'] == '{subregion}' && record['Generation'] && record['Gender'] == '{selected_gender}'"),
-            Config.stackedBar(
-                {
-                    'x': 'Population',
-                    'y': 'ISO3_code',
-                    'stackedBy': 'Generation',
-                    'color': 'Generation',
-                    'title': f"Distribution of All {g_type} Born Since 1950 ({subregion})"
-                }
-            )
-        )
-    )
+
     story.add_slide(slide8)
 
     slide9 = Slide()
+
     slide9.add_step(
         Step(
-            Data.filter(f"record['Continent'] == '{continent}' && record['Generation'] && record['Gender'] == '{selected_gender}'"),
-            Config.bar(
-                {
-                    'x': 'Population',
-                    'y': 'Subregion',
-                    'color': 'Country',
-                    'title': f"Distribution of All {g_type} Born Since 1950 ({continent})"
-                }
-            )
+                Data.filter(None),
+                Config(
+                    {
+                        'label':None,
+                        'x':['Year2','Generation','Population'],
+                        'title': f"You and Your {format_population(pop5)} Age-Mates Are {(pop5 / pop7) * 100:.1f}% of People Born after 1950"
+                    }
+                )
         )
     )
-    slide9.add_step(
-        Step(
-            Data.filter(f"record['Continent'] == '{continent}' && record['Generation'] && record['Gender'] == '{selected_gender}'"),
-            Config.stackedBar(
-                {
-                    'x': 'Population',
-                    'y': 'Subregion',
-                    'stackedBy': 'Generation',
-                    'color': 'Generation',
-                    'title': f"Distribution of All {g_type} Born Since 1950 ({continent})"
-                }
-            )
-        )
-    )
-    story.add_slide(slide9) 
 
-    slide10 = Slide()
-    slide10.add_step(
-        Step(
-            Data.filter(f"record['Generation'] && record['Gender'] == '{selected_gender}'"),
-            Config.bar(
-                {
-                    'x': 'Continent',
-                    'y': 'Population',
-                    'color': 'Generation',
-                    'title': f"Distribution of All {g_type} Born Since 1950 Worldwide"
-                }
-            )
-        )
-    )
-    slide10.add_step(
-        Step(
-            Data.filter(f"record['Generation'] && record['Gender'] == '{selected_gender}'"),
-            Config.stackedBar(
-                {
-                    'x': 'Continent',
-                    'y': 'Population',
-                    'stackedBy': 'Generation',
-                    'color': 'Generation',
-                    'title': f"Distribution of All {g_type} Born Since 1950 Worldwide"
-                }
-            )
-        )
-    )
-    story.add_slide(slide10)
+    story.add_slide(slide9)
 
-    slide11 = Slide(
-        Step(
-            Data.filter(f"record['Generation'] && record['Gender'] == '{selected_gender}'"),
-            Config.bubble(
-                {
-                    'size': 'Population',
-                    'geometry': 'circle',
-                    'color': 'Generation',
-                    'label': 'Generation',
-                    'title': f"Distribution of All {selected_gender}s Born Since 1950 Worldwide"
-                }
-            )
-        )
-    )
-    story.add_slide(slide11)
+ 
+    story.start_slide = 6
 
     # Switch on the tooltip that appears when the user hovers the mouse over a chart element.
     story.set_feature('tooltip', True)
