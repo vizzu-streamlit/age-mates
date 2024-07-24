@@ -6,7 +6,7 @@ from ipyvizzustory import Story, Slide, Step
 from streamlit.components.v1 import html
 
 # Set the app title and configuration
-st.set_page_config(page_title='My Contemporaries', layout='centered')
+st.set_page_config(page_title='My Age-Mates', layout='centered')
 
 # Center the title using HTML and CSS
 st.markdown(
