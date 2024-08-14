@@ -81,11 +81,19 @@ with col3:
 
 g_type = df['G_Type'].loc[df['Gender'] == selected_gender].values[0]
 
-
-
-
 # Add new column to mark selected year
 df['IsSelectedYear'] = df['Year'].apply(lambda x: 'yes' if x == selected_year else 'no')
+
+# Add a column that marks whether the row matches all the selected criteria
+df['MatchCriteria'] = df.apply(lambda row: 'yes' if (row['Country'] == selected_country and row['Gender'] == selected_gender) else 'no', axis=1)
+
+# Sort the DataFrame so that:
+# 1. Rows matching all criteria are at the top.
+# 2. Rows within each generation are sorted by year in ascending order.
+df = df.sort_values(by=['MatchCriteria', 'Year'], ascending=[False, True])
+
+# Drop the MatchCriteria column since it's no longer needed after sorting
+df = df.drop(columns=['MatchCriteria'])
 
 if st.button('Create Story'):
 
@@ -114,62 +122,116 @@ if st.button('Create Story'):
         else:
             return str(population)
 
-
     # Slide 1: No. of people with the same sex, born in the same year, same country
     pop1 = df[(df['Year'] == selected_year) & (df['Country'] == selected_country) & (df['Gender'] == selected_gender)]['Population'].sum()
     title1 = f"You Are One of {format_population(pop1)} {g_type} Born in {selected_year} in {abr_country}"
 
-    # Slide 1: No. of people with the same sex, born in the same year, same country
-    slide1 = Slide(
-        Step(
-            Data.filter(f"record['Year'] == '{selected_year}' && record['Country'] == '{selected_country}' && record['Gender'] == '{selected_gender}'"),
-            Config(
-                {
+        # Slide 1: No. of people with the same sex, born in the same year, same country
+    if selected_gender == 'Male':
+        slide1 = Slide(
+            Step(
+                Data.filter(f"record['Year'] == '{selected_year}' && record['Country'] == '{selected_country}' && record['Gender'] == '{selected_gender}'"),
+                Config(
+                    {
 
-                    'color': 'Gender',
-                    'size': 'Population',
-                    'geometry': 'circle',
-                    'label': 'Population',
-                    'legend':None,
-                    'title': title1
-                }
-            ),
-            Style({
-                'logo' : {'width' : '5em', 'filter': 'none'},
-                'title' : {'fontSize' : '3em'},
-                'plot' : {'marker' :{ 
-                    'label' :{ 
-                        'format' : 'dimensionsFirst',
-                        'fontSize' : '2.5em',
-                        }
-                    }},
-            })
+                        'color': 'Gender',
+                        'size': 'Population',
+                        'geometry': 'circle',
+                        'label': 'Population',
+                        'legend':None,
+                        'title': title1
+                    }
+                ),
+                Style({
+                    'logo' : {'width' : '5em', 'filter': 'none'},
+                    'title' : {'fontSize' : '3em'},
+                    'plot' : {'marker' :{ 
+                        'colorPalette': '#4171CDFF',
+                        'label' :{ 
+                            'format' : 'dimensionsFirst',
+                            'fontSize' : '2.5em',
+                            },
+                        }},
+                })
+            )
         )
-    )
-    story.add_slide(slide1)
+        story.add_slide(slide1)
+    else:
+        slide1 = Slide(
+            Step(
+                Data.filter(f"record['Year'] == '{selected_year}' && record['Country'] == '{selected_country}' && record['Gender'] == '{selected_gender}'"),
+                Config(
+                    {
+
+                        'color': 'Gender',
+                        'size': 'Population',
+                        'geometry': 'circle',
+                        'label': 'Population',
+                        'legend':None,
+                        'title': title1
+                    }
+                ),
+                Style({
+                    'logo' : {'width' : '5em', 'filter': 'none'},
+                    'title' : {'fontSize' : '3em'},
+                    'plot' : {'marker' :{ 
+                        'colorPalette': '#FE34AE',
+                        'label' :{ 
+                            'format' : 'dimensionsFirst',
+                            'fontSize' : '2.5em',
+                            },
+                        }},
+                })
+            )
+        )
+        story.add_slide(slide1)
+
 
     pop2 = df[(df['Year'] == selected_year) & (df['Country'] == selected_country)]['Population'].sum()
     title2 = f"You Are One of {format_population(pop2)} People Born in {selected_year} in {abr_country}"
 
-    slide2 = Slide(
-        Step(
-            Data.filter(f"record['Country'] == '{selected_country}' && record['Year'] == '{selected_year}'"),
-            Config(
-                {
-                    'label': ['G_Type','Population'],
-                    'title': title2
-                }
-            ),
-            Style({
-                'plot' : {'marker' :{ 
-                    'label' :{ 
-                        'fontSize' : '1.8em',
-                        }
-                    }},
-            })
+    if selected_gender == 'Male':
+        slide2 = Slide(
+            Step(
+                Data.filter(f"record['Country'] == '{selected_country}' && record['Year'] == '{selected_year}'"),
+                Config(
+                    {
+                        'label': ['G_Type','Population'],
+                        'title': title2
+                    }
+                ),
+                Style({
+                    'plot' : {'marker' :{
+                            'colorPalette': '#4171CDFF #FE34AE',
+                            'label' :{ 
+                            'fontSize' : '1.8em',
+                            }
+                        }},
+                })
+            )
         )
-    )
-    story.add_slide(slide2)
+        story.add_slide(slide2)
+    else:
+        slide2 = Slide(  
+            Step(
+                    Data.filter(f"record['Country'] == '{selected_country}' && record['Year'] == '{selected_year}'"),
+                    Config(
+                        {
+                            'label': ['G_Type','Population'],
+                            'title': title2
+                        }
+                    ),
+                    Style({
+                        'plot' : {'marker' :{
+                            'colorPalette': '#FE34AE #4171CDFF',
+                            'label' :{ 
+                                'fontSize' : '1.8em',
+                                }
+                            }},
+                    })
+                )
+            )
+        story.add_slide(slide2)
 
     pop3 = df[(df['Subregion'] == subregion) & (df['Year'] == selected_year)]['Population'].sum()
     title3 = f"You Are One of {format_population(pop3)} People Born in {selected_year} in {subregion}"
@@ -187,8 +249,9 @@ if st.button('Create Story'):
                 }
             ),
             Style({
-                 "plot": {
+                "plot": {
                 "marker": {
+                    'colorPalette': '#4171CDFF #03AE71FF #F4941BFF #F4C204FF #D49664FF #F25456FF #9E67ABFF #BCA604FF #846E1CFF #FC763CFF #B462ACFF #F492FCFF #BC4A94FF #9C7EF4FF #9C52B4FF #6CA2FCFF #5C6EBCFF #7C868CFF #AC968CFF #4C7450FF #AC7A4CFF #7CAE54FF #4C7450FF #9C1A6CFF #AC3E94FF #B41204FF',
                     "label": {
                         "numberFormat": "prefixed",
                         "maxFractionDigits": "1",
@@ -235,60 +298,152 @@ if st.button('Create Story'):
     )
     story.add_slide(slide5)
 
-    slide6 = Slide()
-
-    slide6.add_step(
-        Step(
-            Data.filter(f"record['Year'] == '{selected_year}'"),
-            Config(
-                {
-                    'geometry': 'rectangle',
-                    'x': 'Year2',
-                    'y': ['Population','Continent'],
-                    'label': None,
-                    'title': title5
-                }
+    if selected_year == 1950:
+        slide6 = Slide()
+        slide6.add_step(
+            Step(
+                Data.filter(f"record['Year'] == '{selected_year}'"),
+                Config(
+                    {
+                        'geometry': 'rectangle',
+                        'x': 'Year2',
+                        'y': ['Population','Continent'],
+                        'label': None,
+                        'title': title5
+                    }
+                )
             )
         )
-    )
-
-    slide6.add_step(
-        Step(
-            Config(
-                {
-                    'y': 'Population',
-                    'color': 'Generation',
+        slide6.add_step(
+            Step(
+                Config(
+                    {
+                        'y': 'Population',
+                        'color': 'Generation'
+                    }
+                ),
+                Style({
+                    "plot": {
+                    "marker": {
+                        'colorPalette': '#4171CDFF',
+                        "label": {
+                            "numberFormat": "prefixed",
+                            "maxFractionDigits": "1",
+                            "numberScale": "shortScaleSymbolUS",
+                        },
+                    },
                 }
+                })
             )
         )
-    )
+        slide6.add_step(
+            Step(
+                Config(
+                    {
+                        'x': ['Year2', 'IsSelectedYear'],
+                        'label': 'Population',
+                        'color': 'IsSelectedYear'
+                        
+                    }
+                ),
+                Style({
+                    "plot": {
+                    "marker": {
+                        'colorPalette': '#4171CD #c8dafa',
+                    },
+                }
+                })
+            )
+        )
 
+        pop6 = df[(df['Generation'] == generation)]['Population'].sum()
+        title6 = f"You Belong to the {format_population(pop6)} {generation}s Worldwide"
+
+        slide6.add_step(
+            Step(
+                Data.filter(f"record['Generation'] == '{generation}'"),
+                Config(
+                    {
+                        'title': title6,
+                    }
+                )
+            )
+        )
+        story.add_slide(slide6)
+
+    elif selected_year != 1950:
+        slide6 = Slide()
+        slide6.add_step(
+            Step(
+                Data.filter(f"record['Year'] == '{selected_year}'"),
+                Config(
+                    {
+                        'geometry': 'rectangle',
+                        'x': 'Year2',
+                        'y': ['Population','Continent'],
+                        'label': None,
+                        'title': title5
+                    }
+                )
+            )
+        )
+        slide6.add_step(
+            Step(
+                Config(
+                    {
+                        'y': 'Population',
+                        'color': 'Generation'
+                    }
+                ),
+                Style({
+                    "plot": {
+                    "marker": {
+                        'colorPalette': '#4171CDFF',
+                        "label": {
+                            "numberFormat": "prefixed",
+                            "maxFractionDigits": "1",
+                            "numberScale": "shortScaleSymbolUS",
+                        },
+                    },
+                }
+                })
+            )
+        )
+        slide6.add_step(
+            Step(
+                Config(
+                    {
+                        'x': ['Year2', 'IsSelectedYear'],
+                        'label': 'Population',
+                        'color': 'IsSelectedYear'
+                        
+                    }
+                ),
+                Style({
+                    "plot": {
+                    "marker": {
+                        'colorPalette': '#c8dafa #4171CD ',
+                    },
+                }
+                })
+            )
+        )
+
+        pop6 = df[(df['Generation'] == generation)]['Population'].sum()
+        title6 = f"You Belong to the {format_population(pop6)} {generation}s Worldwide"
+
+        slide6.add_step(
+            Step(
+                Data.filter(f"record['Generation'] == '{generation}'"),
+                Config(
+                    {
+                        'title': title6,
+                    }
+                )
+            )
+        )
+        story.add_slide(slide6)
     
-    slide6.add_step(
-        Step(
-            Config(
-                {
-                    'label': 'Population',
-                }
-            )
-        )
-    )
-
-    pop6 = df[(df['Generation'] == generation)]['Population'].sum()
-    title6 = f"You Belong to the {format_population(pop6)} {generation}s Worldwide"
-
-    slide6.add_step(
-        Step(
-            Data.filter(f"record['Generation'] == '{generation}'"),
-            Config(
-                {
-                    'title': title6
-                }
-            )
-        )
-    )
-    story.add_slide(slide6)
-
     slide7 = Slide()
 
     slide7.add_step(
@@ -296,8 +451,16 @@ if st.button('Create Story'):
             Config(
                 {
                     'label': None,
+                    'color': 'Generation'
                 }
-            )
+            ),
+            Style({
+                    "plot": {
+                    "marker": {
+                        'colorPalette': '#4171CD',
+                    },
+                }
+                })
         )
     )
 
@@ -326,21 +489,109 @@ if st.button('Create Story'):
     )
 
     pop7 = df['Population'].sum()
-
-    slide7.add_step(
-        Step(
+    
+    if generation == 'Baby Boomer':
+        slide7.add_step(
+            Step(
                 Data.filter(None),
                 Config(
                     {
                         'label':['Generation','Population'],
-                        'title': f"You Are One of {format_population(pop7)} People Born after 1950 in the World"
+                        'title': f"You Are One of {format_population(pop7)} People Born after 1950 in the World",
+                        'color': 'Generation'
                     }
-                )
+                ),
+                Style({
+                    "plot": {
+                    "marker": {
+                        'colorPalette': '#4171CDFF #03AE71FF #F4941BFF #F4C204FF #D49664FF',
+                    },
+                }
+                })
+            )
         )
-    )
-
+    if generation == 'Gen X':
+        slide7.add_step(
+            Step(
+                Data.filter(None),
+                Config(
+                    {
+                        'label':['Generation','Population'],
+                        'title': f"You Are One of {format_population(pop7)} People Born after 1950 in the World",
+                        'color': 'Generation'
+                    }
+                ),
+                Style({
+                    "plot": {
+                    "marker": {
+                        'colorPalette': '#03AE71FF #4171CDFF #F4941BFF #F4C204FF #D49664FF',
+                    },
+                }
+                })
+            )
+        )
+    if generation == 'Millennial':
+        slide7.add_step(
+            Step(
+                Data.filter(None),
+                Config(
+                    {
+                        'label':['Generation','Population'],
+                        'title': f"You Are One of {format_population(pop7)} People Born after 1950 in the World",
+                        'color': 'Generation'
+                    }
+                ),
+                Style({
+                    "plot": {
+                    "marker": {
+                        'colorPalette': '#03AE71FF #F4941BFF #4171CDFF #F4C204FF #D49664FF',
+                    },
+                }
+                })
+            )
+        )
+    if generation == 'Gen Z':
+        slide7.add_step(
+            Step(
+                Data.filter(None),
+                Config(
+                    {
+                        'label':['Generation','Population'],
+                        'title': f"You Are One of {format_population(pop7)} People Born after 1950 in the World",
+                        'color': 'Generation'
+                    }
+                ),
+                Style({
+                    "plot": {
+                    "marker": {
+                        'colorPalette': '#03AE71FF #F4941BFF #F4C204FF #4171CDFF #D49664FF',
+                    },
+                }
+                })
+            )
+        )
+    if generation == 'Gen A':
+        slide7.add_step(
+            Step(
+                Data.filter(None),
+                Config(
+                    {
+                        'label':['Generation','Population'],
+                        'title': f"You Are One of {format_population(pop7)} People Born after 1950 in the World",
+                        'color': 'Generation'
+                    }
+                ),
+                Style({
+                    "plot": {
+                    "marker": {
+                        'colorPalette': '#03AE71FF #F4941BFF #F4C204FF #D49664FF #4171CDFF',
+                    },
+                }
+                })
+            )
+        )
     story.add_slide(slide7)
-
+    
     slide8 = Slide()
 
     slide8.add_step(
@@ -359,20 +610,20 @@ if st.button('Create Story'):
     story.add_slide(slide8)
 
     slide9 = Slide()
-
     slide9.add_step(
         Step(
                 Data.filter(None),
                 Config(
                     {
                         'label':None,
-                        'x':['Year2','Generation','Population'],
-                        'title': f"You and Your {format_population(pop5)} Age-Mates Are {(pop5 / pop7) * 100:.1f}% of People Born after 1950"
+                        'x':['Year2','Generation','Population', 'IsSelectedYear'],
+                        'title': f"You and Your {format_population(pop5)} Age-Mates Are {(pop5 / pop7) * 100:.1f}% of People Born after 1950",
+                        'lightness': 'IsSelectedYear'
                     }
                 )
+
         )
     )
-
     story.add_slide(slide9)
 
  
