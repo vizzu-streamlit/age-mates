@@ -251,7 +251,7 @@ if st.button('Create Story'):
             Style({
                 "plot": {
                 "marker": {
-                    'colorPalette': '#4171CDFF #03AE71FF #F4941BFF #F4C204FF #D49664FF #F25456FF #9E67ABFF #BCA604FF #846E1CFF #FC763CFF #B462ACFF #F492FCFF #BC4A94FF #9C7EF4FF #9C52B4FF #6CA2FCFF #5C6EBCFF #7C868CFF #AC968CFF #4C7450FF #AC7A4CFF #7CAE54FF #4C7450FF #9C1A6CFF #AC3E94FF #B41204FF',
+                    'colorPalette': '#1f4691 #03AE71FF #F4941BFF #F4C204FF #D49664FF #F25456FF #9E67ABFF #BCA604FF #846E1CFF #FC763CFF #B462ACFF #F492FCFF #BC4A94FF #9C7EF4FF #9C52B4FF #6CA2FCFF #5C6EBCFF #7C868CFF #AC968CFF #4C7450FF #AC7A4CFF #7CAE54FF #4C7450FF #9C1A6CFF #AC3E94FF #B41204FF',
                     "label": {
                         "numberFormat": "prefixed",
                         "maxFractionDigits": "1",
@@ -325,7 +325,7 @@ if st.button('Create Story'):
                 Style({
                     "plot": {
                     "marker": {
-                        'colorPalette': '#4171CDFF',
+                        'colorPalette': '#1f4691',
                         "label": {
                             "numberFormat": "prefixed",
                             "maxFractionDigits": "1",
@@ -342,14 +342,15 @@ if st.button('Create Story'):
                     {
                         'x': ['Year2', 'IsSelectedYear'],
                         'label': 'Population',
-                        'color': 'IsSelectedYear'
+                        'lightness': 'IsSelectedYear'
                         
                     }
                 ),
                 Style({
                     "plot": {
                     "marker": {
-                        'colorPalette': '#4171CD #c8dafa',
+                        'minLightness': -0.4,
+                        'maxLightness': 0.4
                     },
                 }
                 })
@@ -398,7 +399,7 @@ if st.button('Create Story'):
                 Style({
                     "plot": {
                     "marker": {
-                        'colorPalette': '#4171CDFF',
+                        'colorPalette': '#1f4691',
                         "label": {
                             "numberFormat": "prefixed",
                             "maxFractionDigits": "1",
@@ -415,14 +416,15 @@ if st.button('Create Story'):
                     {
                         'x': ['Year2', 'IsSelectedYear'],
                         'label': 'Population',
-                        'color': 'IsSelectedYear'
+                        'lightness': 'IsSelectedYear'
                         
                     }
                 ),
                 Style({
                     "plot": {
                     "marker": {
-                        'colorPalette': '#c8dafa #4171CD ',
+                        'minLightness': 0.4,
+                        'maxLightness': -0.4
                     },
                 }
                 })
@@ -437,59 +439,60 @@ if st.button('Create Story'):
                 Data.filter(f"record['Generation'] == '{generation}'"),
                 Config(
                     {
-                        'title': title6,
+                        'title': title6
                     }
                 )
             )
         )
         story.add_slide(slide6)
     
-        slide7 = Slide()
+    slide7 = Slide()
 
-        slide7.add_step(
-            Step(
-                Config(
-                    {
-                        'label': None,
-                        'color': 'Generation'
-                    }
-                ),
-                Style({
-                        "plot": {
-                        "marker": {
-                            'colorPalette': '#4171CD',
-                        },
-                    }
-                    })
-            )
-        )
-
-        slide7.add_step(
-            Step(
-                Config(
-                    {
-                        'x': ['Generation','Population'],
-                        'y': None
-                    }
-                )
-            )
-        )
-
-        slide7.add_step(
-            Step(
-                Config(
-                    {
-                        'label':'Population'                        
-                    }
-                ),
-                Style({
-                    'plot' : {'marker' :{ 'label' :{ 'position' : 'center'}}},
+    slide7.add_step(
+        Step(
+            Config(
+                {
+                    'label': None,
+                    'color': 'Generation',
+                    'lightness': None
+                }
+            ),
+            Style({
+                    "plot": {
+                    "marker": {
+                        'colorPalette': '#1f4691',
+                    },
+                }
                 })
+        )
+    )
+
+    slide7.add_step(
+        Step(
+            Config(
+                {
+                    'x': ['Generation','Population'],
+                    'y': None
+                }
             )
         )
+    )
 
-        pop7 = df['Population'].sum()
+    slide7.add_step(
+        Step(
+            Config(
+                {
+                    'label':'Population'                        
+                }
+            ),
+            Style({
+                'plot' : {'marker' :{ 'label' :{ 'position' : 'center'}}},
+            })
+        )
+    )
 
+    pop7 = df['Population'].sum()
+    
     if generation == 'Baby Boomer':
         slide7.add_step(
             Step(
@@ -504,7 +507,7 @@ if st.button('Create Story'):
                 Style({
                     "plot": {
                     "marker": {
-                        'colorPalette': '#4171CDFF #03AE71FF #F4941BFF #F4C204FF #D49664FF',
+                        'colorPalette': '#1f4691 #03AE71FF #F4941BFF #F4C204FF #D49664FF',
                     },
                 }
                 })
@@ -524,7 +527,7 @@ if st.button('Create Story'):
                 Style({
                     "plot": {
                     "marker": {
-                        'colorPalette': '#03AE71FF #4171CDFF #F4941BFF #F4C204FF #D49664FF',
+                        'colorPalette': '#03AE71FF #1f4691 #F4941BFF #F4C204FF #D49664FF',
                     },
                 }
                 })
@@ -544,7 +547,7 @@ if st.button('Create Story'):
                 Style({
                     "plot": {
                     "marker": {
-                        'colorPalette': '#03AE71FF #F4941BFF #4171CDFF #F4C204FF #D49664FF',
+                        'colorPalette': '#03AE71FF #F4941BFF #1f4691 #F4C204FF #D49664FF',
                     },
                 }
                 })
@@ -564,7 +567,7 @@ if st.button('Create Story'):
                 Style({
                     "plot": {
                     "marker": {
-                        'colorPalette': '#03AE71FF #F4941BFF #F4C204FF #4171CDFF #D49664FF',
+                        'colorPalette': '#03AE71FF #F4941BFF #F4C204FF #1f4691 #D49664FF',
                     },
                 }
                 })
@@ -584,7 +587,7 @@ if st.button('Create Story'):
                 Style({
                     "plot": {
                     "marker": {
-                        'colorPalette': '#03AE71FF #F4941BFF #F4C204FF #D49664FF #4171CDFF',
+                        'colorPalette': '#03AE71FF #F4941BFF #F4C204FF #D49664FF #1f4691',
                     },
                 }
                 })
@@ -601,22 +604,23 @@ if st.button('Create Story'):
                         {
                             'label':None,
                             'x':['Year2','Generation','Population', 'IsSelectedYear'],
-                            'color': 'IsSelectedYear',
+                            'color': 'Generation',
+                            'lightness': 'IsSelectedYear',
                             'title': f"You and Your {format_population(pop5)} Age-Mates Are {(pop5 / pop7) * 100:.1f}% of People Born after 1950",
                         }
                     ),
                     Style({
                         "plot": {
                         "marker": {
-                            'colorPalette': '#4171CDFF #D3D3D3'
+                            'minLightness': -0.2,
+                            'maxLightness': 0.4
                         },
                     }
                     })
 
-
             )
         )
-    else:
+    elif selected_year != 1950:
         slide8.add_step(
             Step(
                     Data.filter(None),
@@ -624,18 +628,19 @@ if st.button('Create Story'):
                         {
                             'label':None,
                             'x':['Year2','Generation','Population', 'IsSelectedYear'],
-                            'color': 'IsSelectedYear',
+                            'color': 'Generation',
+                            'lightness': 'IsSelectedYear',
                             'title': f"You and Your {format_population(pop5)} Age-Mates Are {(pop5 / pop7) * 100:.1f}% of People Born after 1950",
                         }
                     ),
                     Style({
                         "plot": {
                         "marker": {
-                            'colorPalette': '#D3D3D3 #4171CDFF '
+                            'minLightness': 0.4,
+                            'maxLightness': -0.4
                         },
                     }
                     })
-
 
             )
         )
@@ -644,116 +649,22 @@ if st.button('Create Story'):
     slide9 = Slide()
     pop9 = df['Population'].sum()
     
-    if generation == 'Baby Boomer':
-        slide9.add_step(
-            Step(
-                Data.filter(None),
-                Config(
-                    {
-                        'x': ['Generation', 'Population'],
-                        'label':'Generation',
-                        'title': f"You are one of {format_population(pop9)} People Born After 1950 in the World",
-                        'color': 'Generation'
-                    }
-                ),
-                Style({
-                    "plot": {
-                    "marker": {
-                        'colorPalette': '#4171CDFF #03AE71FF #F4941BFF #F4C204FF #D49664FF',
-                    },
+    slide9.add_step(
+        Step(
+            Data.filter(None),
+            Config(
+                {
+                    'x': ['Generation', 'Population'],
+                    'label':'Generation',
+                    'title': f"You are one of {format_population(pop9)} People Born After 1950 in the World",
+                    'color': 'Generation',
+                    'lightness': None
                 }
-                })
-            )
+            ),
         )
-    if generation == 'Gen X':
-        slide9.add_step(
-            Step(
-                Data.filter(None),
-                Config(
-                    {
-                        'x': ['Generation', 'Population'],
-                        'label': 'Generation',
-                        'title': f"You are one of {format_population(pop9)} People Born After 1950 in the World",
-                        'color': 'Generation'
-                    }
-                ),
-                Style({
-                    "plot": {
-                    "marker": {
-                        'colorPalette': '#03AE71FF #4171CDFF #F4941BFF #F4C204FF #D49664FF',
-                    },
-                }
-                })
-            )
-        )
-    if generation == 'Millennial':
-        slide9.add_step(
-            Step(
-                Data.filter(None),
-                Config(
-                    {
-                        'x': ['Generation', 'Population'],
-                        'label':'Generation',
-                        'title': f"You are one of {format_population(pop9)} People Born After 1950 in the World",
-                        'color': 'Generation'
-                    }
-                ),
-                Style({
-                    "plot": {
-                    "marker": {
-                        'colorPalette': '#03AE71FF #F4941BFF #4171CDFF #F4C204FF #D49664FF',
-                    },
-                }
-                })
-            )
-        )
-    if generation == 'Gen Z':
-        slide9.add_step(
-            Step(
-                Data.filter(None),
-                Config(
-                    {
-                        'x': ['Generation', 'Population'],
-                        'label':'Generation',
-                        'title': f"You are one of {format_population(pop9)} People Born After 1950 in the World",
-                        'color': 'Generation'
-                    }
-                ),
-                Style({
-                    "plot": {
-                    "marker": {
-                        'colorPalette': '#03AE71FF #F4941BFF #F4C204FF #4171CDFF #D49664FF',
-                    },
-                }
-                })
-            )
-        )
-    if generation == 'Gen A':
-        slide9.add_step(
-            Step(
-                Data.filter(None),
-                Config(
-                    {
-                        'x': ['Generation', 'Population'],
-                        'label':'Generation',
-                        'title': f"You are one of {format_population(pop9)} People Born After 1950 in the World",
-                        'color': 'Generation'
-                    }
-                ),
-                Style({
-                    "plot": {
-                    "marker": {
-                        'colorPalette': '#03AE71FF #F4941BFF #F4C204FF #D49664FF #4171CDFF',
-                    },
-                }
-                })
-            )
-        )
+    )
     story.add_slide(slide9)
-
- 
-    #story.start_slide = 6
-
+    
     # Switch on the tooltip that appears when the user hovers the mouse over a chart element.
     story.set_feature('tooltip', True)
 
