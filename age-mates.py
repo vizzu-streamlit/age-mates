@@ -444,52 +444,52 @@ if st.button('Create Story'):
         )
         story.add_slide(slide6)
     
-    slide7 = Slide()
+        slide7 = Slide()
 
-    slide7.add_step(
-        Step(
-            Config(
-                {
-                    'label': None,
-                    'color': 'Generation'
-                }
-            ),
-            Style({
-                    "plot": {
-                    "marker": {
-                        'colorPalette': '#4171CD',
-                    },
-                }
-                })
-        )
-    )
-
-    slide7.add_step(
-        Step(
-            Config(
-                {
-                    'x': ['Generation','Population'],
-                    'y': None
-                }
+        slide7.add_step(
+            Step(
+                Config(
+                    {
+                        'label': None,
+                        'color': 'Generation'
+                    }
+                ),
+                Style({
+                        "plot": {
+                        "marker": {
+                            'colorPalette': '#4171CD',
+                        },
+                    }
+                    })
             )
         )
-    )
 
-    slide7.add_step(
-        Step(
-            Config(
-                {
-                    'label':'Population'                        
-                }
-            ),
-            Style({
-                'plot' : {'marker' :{ 'label' :{ 'position' : 'center'}}},
-            })
+        slide7.add_step(
+            Step(
+                Config(
+                    {
+                        'x': ['Generation','Population'],
+                        'y': None
+                    }
+                )
+            )
         )
-    )
 
-    pop7 = df['Population'].sum()
-    
+        slide7.add_step(
+            Step(
+                Config(
+                    {
+                        'label':'Population'                        
+                    }
+                ),
+                Style({
+                    'plot' : {'marker' :{ 'label' :{ 'position' : 'center'}}},
+                })
+            )
+        )
+
+        pop7 = df['Population'].sum()
+
     if generation == 'Baby Boomer':
         slide7.add_step(
             Step(
@@ -497,7 +497,7 @@ if st.button('Create Story'):
                 Config(
                     {
                         'label':['Generation','Population'],
-                        'title': f"You Are One of {format_population(pop7)} People Born after 1950 in the World",
+                        'title': f"Your Generation is {(pop6 / pop7) * 100:.1f}% of People Born after 1950",
                         'color': 'Generation'
                     }
                 ),
@@ -517,7 +517,7 @@ if st.button('Create Story'):
                 Config(
                     {
                         'label':['Generation','Population'],
-                        'title': f"You Are One of {format_population(pop7)} People Born after 1950 in the World",
+                        'title': f"Your Generation is {(pop6 / pop7) * 100:.1f}% of People Born after 1950",
                         'color': 'Generation'
                     }
                 ),
@@ -537,7 +537,7 @@ if st.button('Create Story'):
                 Config(
                     {
                         'label':['Generation','Population'],
-                        'title': f"You Are One of {format_population(pop7)} People Born after 1950 in the World",
+                        'title': f"Your Generation is {(pop6 / pop7) * 100:.1f}% of People Born after 1950",
                         'color': 'Generation'
                     }
                 ),
@@ -557,7 +557,7 @@ if st.button('Create Story'):
                 Config(
                     {
                         'label':['Generation','Population'],
-                        'title': f"You Are One of {format_population(pop7)} People Born after 1950 in the World",
+                        'title': f"Your Generation is {(pop6 / pop7) * 100:.1f}% of People Born after 1950",
                         'color': 'Generation'
                     }
                 ),
@@ -577,7 +577,7 @@ if st.button('Create Story'):
                 Config(
                     {
                         'label':['Generation','Population'],
-                        'title': f"You Are One of {format_population(pop7)} People Born after 1950 in the World",
+                        'title': f"Your Generation is {(pop6 / pop7) * 100:.1f}% of People Born after 1950",
                         'color': 'Generation'
                     }
                 ),
@@ -591,39 +591,164 @@ if st.button('Create Story'):
             )
         )
     story.add_slide(slide7)
-    
+
     slide8 = Slide()
-
-    slide8.add_step(
-        Step(
-                Data.filter(None),
-                Config(
-                    {
-                        'label':['Generation','Population'],
-                        'align':'stretch',
-                        'title': f"Your Generation is {(pop6 / pop7) * 100:.1f}% of People Born after 1950"
+    if selected_year == 1950:
+        slide8.add_step(
+            Step(
+                    Data.filter(None),
+                    Config(
+                        {
+                            'label':None,
+                            'x':['Year2','Generation','Population', 'IsSelectedYear'],
+                            'color': 'IsSelectedYear',
+                            'title': f"You and Your {format_population(pop5)} Age-Mates Are {(pop5 / pop7) * 100:.1f}% of People Born after 1950",
+                        }
+                    ),
+                    Style({
+                        "plot": {
+                        "marker": {
+                            'colorPalette': '#4171CDFF #D3D3D3'
+                        },
                     }
-                )
-        )
-    )
+                    })
 
+
+            )
+        )
+    else:
+        slide8.add_step(
+            Step(
+                    Data.filter(None),
+                    Config(
+                        {
+                            'label':None,
+                            'x':['Year2','Generation','Population', 'IsSelectedYear'],
+                            'color': 'IsSelectedYear',
+                            'title': f"You and Your {format_population(pop5)} Age-Mates Are {(pop5 / pop7) * 100:.1f}% of People Born after 1950",
+                        }
+                    ),
+                    Style({
+                        "plot": {
+                        "marker": {
+                            'colorPalette': '#D3D3D3 #4171CDFF '
+                        },
+                    }
+                    })
+
+
+            )
+        )
     story.add_slide(slide8)
 
     slide9 = Slide()
-    slide9.add_step(
-        Step(
+    pop9 = df['Population'].sum()
+    
+    if generation == 'Baby Boomer':
+        slide9.add_step(
+            Step(
                 Data.filter(None),
                 Config(
                     {
-                        'label':None,
-                        'x':['Year2','Generation','Population', 'IsSelectedYear'],
-                        'title': f"You and Your {format_population(pop5)} Age-Mates Are {(pop5 / pop7) * 100:.1f}% of People Born after 1950",
-                        'lightness': 'IsSelectedYear'
+                        'x': ['Generation', 'Population'],
+                        'label':'Generation',
+                        'title': f"You are one of {format_population(pop9)} People Born After 1950 in the World",
+                        'color': 'Generation'
                     }
-                )
-
+                ),
+                Style({
+                    "plot": {
+                    "marker": {
+                        'colorPalette': '#4171CDFF #03AE71FF #F4941BFF #F4C204FF #D49664FF',
+                    },
+                }
+                })
+            )
         )
-    )
+    if generation == 'Gen X':
+        slide9.add_step(
+            Step(
+                Data.filter(None),
+                Config(
+                    {
+                        'x': ['Generation', 'Population'],
+                        'label': 'Generation',
+                        'title': f"You are one of {format_population(pop9)} People Born After 1950 in the World",
+                        'color': 'Generation'
+                    }
+                ),
+                Style({
+                    "plot": {
+                    "marker": {
+                        'colorPalette': '#03AE71FF #4171CDFF #F4941BFF #F4C204FF #D49664FF',
+                    },
+                }
+                })
+            )
+        )
+    if generation == 'Millennial':
+        slide9.add_step(
+            Step(
+                Data.filter(None),
+                Config(
+                    {
+                        'x': ['Generation', 'Population'],
+                        'label':'Generation',
+                        'title': f"You are one of {format_population(pop9)} People Born After 1950 in the World",
+                        'color': 'Generation'
+                    }
+                ),
+                Style({
+                    "plot": {
+                    "marker": {
+                        'colorPalette': '#03AE71FF #F4941BFF #4171CDFF #F4C204FF #D49664FF',
+                    },
+                }
+                })
+            )
+        )
+    if generation == 'Gen Z':
+        slide9.add_step(
+            Step(
+                Data.filter(None),
+                Config(
+                    {
+                        'x': ['Generation', 'Population'],
+                        'label':'Generation',
+                        'title': f"You are one of {format_population(pop9)} People Born After 1950 in the World",
+                        'color': 'Generation'
+                    }
+                ),
+                Style({
+                    "plot": {
+                    "marker": {
+                        'colorPalette': '#03AE71FF #F4941BFF #F4C204FF #4171CDFF #D49664FF',
+                    },
+                }
+                })
+            )
+        )
+    if generation == 'Gen A':
+        slide9.add_step(
+            Step(
+                Data.filter(None),
+                Config(
+                    {
+                        'x': ['Generation', 'Population'],
+                        'label':'Generation',
+                        'title': f"You are one of {format_population(pop9)} People Born After 1950 in the World",
+                        'color': 'Generation'
+                    }
+                ),
+                Style({
+                    "plot": {
+                    "marker": {
+                        'colorPalette': '#03AE71FF #F4941BFF #F4C204FF #D49664FF #4171CDFF',
+                    },
+                }
+                })
+            )
+        )
     story.add_slide(slide9)
 
  
