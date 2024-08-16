@@ -210,7 +210,7 @@ if st.button('Create Story'):
                     'plot' : {'marker' :{
                             'colorPalette': '#4171CDFF #FE34AE',
                             'label' :{ 
-                            'format': 'dimensionFirst',
+                            'format': 'measureFirst',
                             'fontSize' : '1.8em',
                             }
                         }},
@@ -232,6 +232,7 @@ if st.button('Create Story'):
                         'plot' : {'marker' :{
                             'colorPalette': '#FE34AE #4171CDFF',
                             'label' :{ 
+                                'format': 'measureFirst',
                                 'fontSize' : '1.8em',
                                 }
                             }},
@@ -239,7 +240,7 @@ if st.button('Create Story'):
                 )
             )
         story.add_slide(slide2)
-
+    
     pop3 = df[(df['Subregion'] == subregion) & (df['Year'] == selected_year)]['Population'].sum()
     title3 = f"You Are One of {format_population(pop3)} People Born in {selected_year} in {subregion}"
 
@@ -260,7 +261,7 @@ if st.button('Create Story'):
                 "marker": {
                     'colorPalette': '#1f4691 #03AE71FF #F4941BFF #F4C204FF #D49664FF #F25456FF #9E67ABFF #BCA604FF #846E1CFF #FC763CFF #B462ACFF #F492FCFF #BC4A94FF #9C7EF4FF #9C52B4FF #6CA2FCFF #5C6EBCFF #7C868CFF #AC968CFF #4C7450FF #AC7A4CFF #7CAE54FF #4C7450FF #9C1A6CFF #AC3E94FF #B41204FF',
                     "label": {
-                        'format': 'measureFirst',
+                        'format': 'dimensionsFirst',
                         "numberFormat": "prefixed",
                         "maxFractionDigits": "1",
                         "numberScale": "shortScaleSymbolUS",
