@@ -112,6 +112,13 @@ if st.button('Create Story'):
     # Initialize the story
     story = Story(data=vizzu_data)
 
+    # Set a handler that prevents showing specific elements
+
+    label_handler_method = (
+        "if(event.detail.text.split(',')[1] < 1000) event.preventDefault()"
+    )
+    story.add_event("plot-marker-label-draw", label_handler_method)
+
     def format_population(population):
         if population >= 1e9:
             return f"{population / 1e9:.1f}B"
@@ -186,6 +193,8 @@ if st.button('Create Story'):
         )
         story.add_slide(slide1)
 
+        story.add_event("plot-marker-label-draw", "event.Default()")
+
 
     pop2 = df[(df['Year'] == selected_year) & (df['Country'] == selected_country)]['Population'].sum()
     title2 = f"You Are One of {format_population(pop2)} People Born in {selected_year} in {abr_country}"
@@ -232,6 +241,8 @@ if st.button('Create Story'):
                 )
             )
         story.add_slide(slide2)
+
+        story.add_event("plot-marker-label-draw", "event.Default()")
 
     pop3 = df[(df['Subregion'] == subregion) & (df['Year'] == selected_year)]['Population'].sum()
     title3 = f"You Are One of {format_population(pop3)} People Born in {selected_year} in {subregion}"
@@ -461,6 +472,8 @@ if st.button('Create Story'):
                     "plot": {
                     "marker": {
                         'colorPalette': '#1f4691',
+                        'minLightness': 0,
+                        'maxLightness': 0
                     },
                 }
                 })
