@@ -210,6 +210,7 @@ if st.button('Create Story'):
                     'plot' : {'marker' :{
                             'colorPalette': '#4171CDFF #FE34AE',
                             'label' :{ 
+                            'format': 'dimensionFirst',
                             'fontSize' : '1.8em',
                             }
                         }},
@@ -259,6 +260,7 @@ if st.button('Create Story'):
                 "marker": {
                     'colorPalette': '#1f4691 #03AE71FF #F4941BFF #F4C204FF #D49664FF #F25456FF #9E67ABFF #BCA604FF #846E1CFF #FC763CFF #B462ACFF #F492FCFF #BC4A94FF #9C7EF4FF #9C52B4FF #6CA2FCFF #5C6EBCFF #7C868CFF #AC968CFF #4C7450FF #AC7A4CFF #7CAE54FF #4C7450FF #9C1A6CFF #AC3E94FF #B41204FF',
                     "label": {
+                        'format': 'measureFirst',
                         "numberFormat": "prefixed",
                         "maxFractionDigits": "1",
                         "numberScale": "shortScaleSymbolUS",
@@ -655,9 +657,10 @@ if st.button('Create Story'):
     story.add_slide(slide8)
 
     handler = """
-    if (window.storyCurrentSlide !== undefined && window.storyBgImages[window.storyCurrentSlide]) {
-        event.renderingContext.drawImage(window.storyBgImages[window.storyCurrentSlide], 0, 0,
-            event.data.rect.size.x, event.data.rect.size.y);
+    const currentSlide = document.getElementById("current-slide");
+    if (currentSlide !== 0 && window.storyImages[currentSlide.innerHTML]) {
+        event.renderingContext.drawImage(window.storyImages[currentSlide.innerHTML], 0, 0,
+            event.detail.rect.size.x, event.detail.rect.size.y);
         event.preventDefault();
     }
     """
@@ -665,29 +668,38 @@ if st.button('Create Story'):
 
     update_event_html = """
     <div><script type="module">
-    function loadImage(url) {
-        return new Promise((resolve) => {
-        const image = new Image();
-        image.addEventListener('load', () => { resolve(image); });
-        image.src = url;
-        })
-    }
+    window.storyImages = {};
+    window.storyImages[1] = new Image();
+    window.storyImages[1].src = 'data:image/gif;base64,R0lGODlhAwACAPIAAJLf6q/i7M/r8un0+PT6+/n8/QAAAAAAACH5BAQAAAAALAAAAAADAAIAAAMEWBMkkAA7';
 
+    window.storyImages[2] = new Image();
+    window.storyImages[2].src = "https://raw.githubusercontent.com/vizzu-streamlit/age-mates/main/66a7736d61b51207bfff94e2_Vizzu-Team-Staircase-v2.webp";
+
+    window.storyImages[1].onload = () => {
+    window.storyImages[2].onload = () => {
+    // ...
+    // window.storyImages[N].onload = () => {
     const vp = document.querySelector("vizzu-player");
-
-    Promise.all([
-        vp.initializing,
-        loadImage('66a7736d61b51207bfff94e2_Vizzu-Team-Staircase-v2.webp'),
-        loadImage('https://raw.githubusercontent.com/vizzu-streamlit/age-mates/main/66a7736d61b51207bfff94e2_Vizzu-Team-Staircase-v2.webp')   
-    ]).then(values => {
-        const [chart, ...images] = values;
-        window.storyBgImages = images;
+    vp.initializing.then(chart => {
         vp.addEventListener('update', (e) => {
-        window.storyCurrentSlide = e.detail.currentSlide;
-        chart.render.updateFrame(true);
+            var slide_num = Number(`${e.detail.currentSlide}`) + 1
+            
+            switch (slide_num) {
+                case 1:
+                    document.getElementById("current-slide").innerHTML = 1;
+                    chart.feature.rendering.update();
+                    break;
+                case 2:
+                    document.getElementById("current-slide").innerHTML = 2;
+                    chart.feature.rendering.update();
+                    break;
+                default:
+                    break;
+            }
         });
-        chart.render.updateFrame(true);
-    })
+    });
+    };
+    };
     </script></div>
     """
     
