@@ -657,9 +657,8 @@ if st.button('Create Story'):
     story.add_slide(slide8)
 
     handler = """
-    const currentSlide = document.getElementById("current-slide");
-    if (currentSlide !== 0 && window.storyImages[currentSlide.innerHTML]) {
-        event.renderingContext.drawImage(window.storyImages[currentSlide.innerHTML], 0, 0,
+    if (window.storyCurrentSlide !== undefined && window.storyBgImages[window.storyCurrentSlide]) {
+        event.renderingContext.drawImage(window.storyBgImages[window.storyCurrentSlide], 0, 0,
             event.detail.rect.size.x, event.detail.rect.size.y);
         event.preventDefault();
     }
@@ -668,47 +667,44 @@ if st.button('Create Story'):
 
     update_event_html = """
     <div><script type="module">
-    window.storyImages = {};
-    window.storyImages[1] = new Image();
-    window.storyImages[1].src = 'data:image/gif;base64,R0lGODlhAwACAPIAAJLf6q/i7M/r8un0+PT6+/n8/QAAAAAAACH5BAQAAAAALAAAAAADAAIAAAMEWBMkkAA7';
+    function loadImage(url) {
+        return new Promise((resolve) => {
+        const image = new Image();
+        image.addEventListener('load', () => { resolve(image); });
+        image.src = url;
+        })
+    }
 
-    window.storyImages[2] = new Image();
-    window.storyImages[2].src = "https://raw.githubusercontent.com/vizzu-streamlit/age-mates/main/66a7736d61b51207bfff94e2_Vizzu-Team-Staircase-v2.webp";
-
-    window.storyImages[1].onload = () => {
-    window.storyImages[2].onload = () => {
-    // ...
-    // window.storyImages[N].onload = () => {
     const vp = document.querySelector("vizzu-player");
-    vp.initializing.then(chart => {
+
+    Promise.all([
+        vp.initializing,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        loadImage('https://raw.githubusercontent.com/vizzu-streamlit/age-mates/main/66a7736d61b51207bfff94e2_Vizzu-Team-Staircase-v2.webp')   
+    ]).then(values => {
+        const [chart, ...images] = values;
+        window.storyBgImages = images;
         vp.addEventListener('update', (e) => {
-            var slide_num = Number(`${e.detail.currentSlide}`) + 1
-            
-            switch (slide_num) {
-                case 1:
-                    document.getElementById("current-slide").innerHTML = 1;
-                    chart.feature.rendering.update();
-                    break;
-                case 2:
-                    document.getElementById("current-slide").innerHTML = 2;
-                    chart.feature.rendering.update();
-                    break;
-                default:
-                    break;
-            }
+        window.storyCurrentSlide = e.detail.currentSlide;
+        chart.feature.rendering.update();
         });
-    });
-    };
-    };
+        chart.feature.rendering.update();
+    })
     </script></div>
     """
     
     # Switch on the tooltip that appears when the user hovers the mouse over a chart element.
     story.set_feature('tooltip', True)
 
-    html(story._repr_html_(), width=width, height=height)
+    html(story._repr_html_() + update_event_html, width=width, height=height)
 
-    st.download_button('Download HTML export', story.to_html(), file_name=f'demographics-{selected_country}.html', mime='text/html')
+    st.download_button('Download HTML export', story.to_html() + update_event_html, file_name=f'demographics-{selected_country}.html', mime='text/html')
 
     # Close the centered div
     st.markdown('</div>', unsafe_allow_html=True)
