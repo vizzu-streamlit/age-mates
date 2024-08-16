@@ -349,7 +349,7 @@ if st.button('Create Story'):
                 Style({
                     "plot": {
                     "marker": {
-                        'minLightness': -0.4,
+                        'minLightness': 0,
                         'maxLightness': 0.4
                     },
                 }
@@ -365,7 +365,7 @@ if st.button('Create Story'):
                 Data.filter(f"record['Generation'] == '{generation}'"),
                 Config(
                     {
-                        'title': title6,
+                        'title': title6
                     }
                 )
             )
@@ -424,7 +424,7 @@ if st.button('Create Story'):
                     "plot": {
                     "marker": {
                         'minLightness': 0.4,
-                        'maxLightness': -0.4
+                        'maxLightness': 0
                     },
                 }
                 })
@@ -612,7 +612,7 @@ if st.button('Create Story'):
                     Style({
                         "plot": {
                         "marker": {
-                            'minLightness': -0.2,
+                            'minLightness': 0,
                             'maxLightness': 0.4
                         },
                     }
@@ -637,7 +637,7 @@ if st.button('Create Story'):
                         "plot": {
                         "marker": {
                             'minLightness': 0.4,
-                            'maxLightness': -0.4
+                            'maxLightness': 0
                         },
                     }
                     })
@@ -646,24 +646,42 @@ if st.button('Create Story'):
         )
     story.add_slide(slide8)
 
-    slide9 = Slide()
-    pop9 = df['Population'].sum()
-    
-    slide9.add_step(
-        Step(
-            Data.filter(None),
-            Config(
-                {
-                    'x': ['Generation', 'Population'],
-                    'label':'Generation',
-                    'title': f"You are one of {format_population(pop9)} People Born After 1950 in the World",
-                    'color': 'Generation',
-                    'lightness': None
-                }
-            ),
-        )
-    )
-    story.add_slide(slide9)
+    handler = """
+    if (window.storyCurrentSlide !== undefined && window.storyBgImages[window.storyCurrentSlide]) {
+        event.renderingContext.drawImage(window.storyBgImages[window.storyCurrentSlide], 0, 0,
+            event.data.rect.size.x, event.data.rect.size.y);
+        event.preventDefault();
+    }
+    """
+    story.add_event("background-draw", handler)
+
+    update_event_html = """
+    <div><script type="module">
+    function loadImage(url) {
+        return new Promise((resolve) => {
+        const image = new Image();
+        image.addEventListener('load', () => { resolve(image); });
+        image.src = url;
+        })
+    }
+
+    const vp = document.querySelector("vizzu-player");
+
+    Promise.all([
+        vp.initializing,
+        loadImage('66a7736d61b51207bfff94e2_Vizzu-Team-Staircase-v2.webp'),
+        loadImage('https://raw.githubusercontent.com/vizzu-streamlit/age-mates/main/66a7736d61b51207bfff94e2_Vizzu-Team-Staircase-v2.webp')   
+    ]).then(values => {
+        const [chart, ...images] = values;
+        window.storyBgImages = images;
+        vp.addEventListener('update', (e) => {
+        window.storyCurrentSlide = e.detail.currentSlide;
+        chart.render.updateFrame(true);
+        });
+        chart.render.updateFrame(true);
+    })
+    </script></div>
+    """
     
     # Switch on the tooltip that appears when the user hovers the mouse over a chart element.
     story.set_feature('tooltip', True)
