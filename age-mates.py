@@ -193,9 +193,6 @@ if st.button('Create Story'):
         )
         story.add_slide(slide1)
 
-        story.add_event("plot-marker-label-draw", "event.Default()")
-
-
     pop2 = df[(df['Year'] == selected_year) & (df['Country'] == selected_country)]['Population'].sum()
     title2 = f"You Are One of {format_population(pop2)} People Born in {selected_year} in {abr_country}"
 
@@ -241,8 +238,6 @@ if st.button('Create Story'):
                 )
             )
         story.add_slide(slide2)
-
-        story.add_event("plot-marker-label-draw", "event.Default()")
 
     pop3 = df[(df['Subregion'] == subregion) & (df['Year'] == selected_year)]['Population'].sum()
     title3 = f"You Are One of {format_population(pop3)} People Born in {selected_year} in {subregion}"
